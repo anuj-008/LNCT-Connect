@@ -1,0 +1,216 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: url('/static/images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #e6f7ff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Adjust to allow content spacing */
+    height: 100vh;
+    margin-top: 80px; /* Adjusted to account for the fixed header */
+}
+
+/* Header Styling */
+header {
+    background: rgba(0, 0, 0, 0.8);
+    color: #4dc9ff;
+    padding: 15px 20px;
+    width: 100%;
+    position: fixed; /* Keep header fixed */
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000; /* Ensure header stays on top */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    height: 80px; /* Explicit header height */
+}
+
+header .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+header nav a {
+    color: #4dc9ff;
+    margin: 0 15px;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+header nav a:hover {
+    text-decoration: underline;
+}
+
+/* Container Styling for Login and Signup */
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the container */
+    background: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+
+/* LNCT Connect Title */
+h1.lnct-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #4dc9ff; /* Light blue color for branding */
+    text-shadow: 0 0 10px rgba(77, 201, 255, 0.8);
+    text-align: center;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #4dc9ff; /* Light blue to match the image */
+}
+
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin: 15px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+input {
+    background: rgba(255, 255, 255, 0.8);
+    color: #333;
+    transition: box-shadow 0.3s ease-in-out, border 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border: 1px solid #4dc9ff;
+    box-shadow: 0 0 8px rgba(77, 201, 255, 0.7);
+}
+
+button {
+    background: linear-gradient(135deg, #4dc9ff, #007bff);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    transform: translateY(-2px);
+}
+
+a {
+    color: #4dc9ff;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Highlight Button Styling */
+.highlight-button {
+    background: linear-gradient(135deg, #ff7a7a, #ff3d3d); /* Vibrant gradient */
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 10px rgba(255, 61, 61, 0.6); /* Make it pop */
+}
+
+.highlight-button:hover {
+    background: linear-gradient(135deg, #ff3d3d, #d00000); /* Darker on hover */
+    transform: translateY(-2px); /* Lift effect */
+    box-shadow: 0 6px 12px rgba(255, 61, 61, 0.8); /* Enhanced shadow on hover */
+}
+
+/* Align Buttons */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.button-group button {
+    flex: 1;
+}
+
+/* Main Section */
+main {
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+main h2 {
+    color: #4dc9ff;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+section {
+    margin-bottom: 30px;
+}
+
+section form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #e6f7ff;
+}
+
+section form input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #4dc9ff;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s;
+}
+
+section form button {
+    background: linear-gradient(135deg, #4dc9ff, #007bff);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+section form button:hover {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    transform: translateY(-2px);
+}

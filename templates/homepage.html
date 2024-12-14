@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Homepage</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">LNCT Connect</div>
+        <nav>
+            <a href="#profile">Profile</a>
+            <a href="#search">Search</a>
+            <a href="#chat">Chat</a>
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Profile Section -->
+        <section id="profile">
+            <h2>Create Your Profile</h2>
+            <form action="/profile" method="POST">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+                <label for="interests">Interests:</label>
+                <input type="text" id="interests" name="interests" placeholder="Enter your interests" required>
+
+                <button type="submit">Save Profile</button>
+            </form>
+        </section>
+
+        <!-- Search Section -->
+        <section id="search">
+            <h2>Search Users</h2>
+            <input type="text" id="searchInput" placeholder="Search by name or interests">
+            <button id="searchButton">Search</button>
+            <ul id="searchResults"></ul>
+        </section>
+
+        <!-- Chat Section -->
+        <section id="chat">
+            <h2>Chat Room</h2>
+            <ul id="messages"></ul>
+            <input id="messageInput" type="text" placeholder="Type your message">
+            <button id="sendButton">Send</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 LNCTConnect. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Search Functionality
+        document.getElementById('searchButton').addEventListener('click', async () => {
+            const query = document.getElementById('searchInput').value;
+            const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
+            const results = await response.json();
+
+            const resultsList = document.getElementById('searchResults');
+            resultsList.innerHTML = ''; // Clear previous results
+
+            if (results.length === 0) {
+                resultsList.innerHTML = '<li>No results found</li>';
+            } else {
+                results.forEach(user => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <strong>${user.name || user.username}</strong> <br>
+                        Email: ${user.email || 'N/A'} <br>
+                        Interests: ${user.interests || 'N/A'}
+                    `;
+                    resultsList.appendChild(li);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
