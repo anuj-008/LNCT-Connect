@@ -2,11 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 import json
 import os
 
-
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
-port = int(os.environ.get("PORT", 5000))  # Default to 5000 if PORT isn't set
-app.run(host='0.0.0.0', port=port)
+
 # Function to load user data
 def load_users():
     if not os.path.exists('users.json'):
@@ -107,4 +105,6 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Move app.run() here to ensure it runs only once
+    port = int(os.environ.get("PORT", 5000))  # Default to 5000 if PORT isn't set
+    app.run(host='0.0.0.0', port=port, debug=True)
