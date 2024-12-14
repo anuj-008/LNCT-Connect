@@ -1,22 +1,33 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-import json
+import psycopg2
+from psycopg2.extras import RealDictCursor
 import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-# Function to load user data
-def load_users():
-    if not os.path.exists('users.json'):
-        with open('users.json', 'w') as file:
-            json.dump({}, file)
-    with open('users.json', 'r') as file:
-        return json.load(file)
+# Function to connect to the database
+def get_db_connection():
+    db_url = os.environ.get("DATABASE_URL")  # Get the database URL from environment variables
+    conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor)
+    return conn
 
-# Function to save user data
-def save_users(users):
-    with open('users.json', 'w') as file:
-        json.dump(users, file, indent=4)
+# Function to create database tables
+def create_tables():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            username VARCHAR(50) PRIMARY KEY,
+            password TEXT NOT NULL,
+            email TEXT,
+            name TEXT,
+            interests TEXT
+        );
+    ''')
+    conn.commit()
+    cur.close()
+    conn.close()
 
 @app.route('/')
 def homepage():
@@ -29,12 +40,21 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        users = load_users()
+        conn = get_db_connection()
+        cur = conn.cursor()
 
-        if username in users and users[username]['password'] == password:
+        # Check user credentials
+        cur.execute('SELECT * FROM users WHERE username = %s AND password = %s;', (username, password))
+        user = cur.fetchone()
+
+        cur.close()
+        conn.close()
+
+        if user:
             session['username'] = username
             return redirect(url_for('homepage'))
         return "Invalid credentials! Please try again.", 401
+
     return render_template('login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -42,18 +62,28 @@ def signup():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        users = load_users()
+        conn = get_db_connection()
+        cur = conn.cursor()
 
-        if username in users:
+        # Check if the username already exists
+        cur.execute('SELECT * FROM users WHERE username = %s;', (username,))
+        existing_user = cur.fetchone()
+
+        if existing_user:
+            cur.close()
+            conn.close()
             return "Username already exists!", 409
 
-        users[username] = {
-            'password': password,
-            'email': '',
-            'name': '',
-            'interests': ''
-        }
-        save_users(users)
+        # Insert the new user
+        cur.execute('''
+            INSERT INTO users (username, password, email, name, interests)
+            VALUES (%s, %s, '', '', '');
+        ''', (username, password))
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
         session['username'] = username
         return redirect(url_for('homepage'))
 
@@ -65,19 +95,25 @@ def save_profile():
         return redirect(url_for('login'))
 
     username = session['username']
-    users = load_users()
+    email = request.form['email']
+    name = request.form['name']
+    interests = request.form['interests']
 
-    if username in users:
-        # Update profile fields
-        users[username]['name'] = request.form['name']
-        users[username]['email'] = request.form['email']
-        users[username]['interests'] = request.form['interests']
+    conn = get_db_connection()
+    cur = conn.cursor()
 
-        # Save updated data
-        save_users(users)
-        return redirect(url_for('homepage'))
+    # Update profile details
+    cur.execute('''
+        UPDATE users
+        SET email = %s, name = %s, interests = %s
+        WHERE username = %s;
+    ''', (email, name, interests, username))
+    conn.commit()
 
-    return "User not found!", 404
+    cur.close()
+    conn.close()
+
+    return redirect(url_for('homepage'))
 
 @app.route('/search', methods=['GET'])
 def search_users():
@@ -85,17 +121,21 @@ def search_users():
         return redirect(url_for('login'))
 
     query = request.args.get('query', '').lower()
-    users = load_users()
-    results = []
+    conn = get_db_connection()
+    cur = conn.cursor()
 
-    for username, data in users.items():
-        if query in username.lower() or query in data.get('name', '').lower() or query in data.get('interests', '').lower():
-            results.append({
-                'username': username,
-                'name': data.get('name', ''),
-                'email': data.get('email', ''),
-                'interests': data.get('interests', '')
-            })
+    # Perform a search for users based on username, name, or interests
+    cur.execute('''
+        SELECT username, name, email, interests
+        FROM users
+        WHERE LOWER(username) LIKE %s
+           OR LOWER(name) LIKE %s
+           OR LOWER(interests) LIKE %s;
+    ''', (f'%{query}%', f'%{query}%', f'%{query}%'))
+    results = cur.fetchall()
+
+    cur.close()
+    conn.close()
 
     return jsonify(results)
 
@@ -105,6 +145,8 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    # Move app.run() here to ensure it runs only once
-    port = int(os.environ.get("PORT", 5000))  # Default to 5000 if PORT isn't set
-    app.run(host='0.0.0.0', port=port, debug=True)
+    # Create tables if they don't exist
+    create_tables()
+
+    # Run the Flask app
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=True)
