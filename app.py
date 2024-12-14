@@ -144,6 +144,22 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
+@app.route('/users', methods=['GET'])
+def get_all_users():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Fetch all users
+    cur.execute('SELECT username, email, name, interests FROM users;')
+    users = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    # Return data as JSON
+    return jsonify(users)
+
+
 if __name__ == '__main__':
     # Create tables if they don't exist
     create_tables()
